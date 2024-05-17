@@ -18,7 +18,7 @@ task profiling {
     String plate_id
 
     # Pycytominer aggregation step
-    String aggregation_operation = "mean"
+    String aggregation_operation = "median"
     Boolean add_image_features = false
     Array[String] image_feature_categories = ["Intensity", "Granularity", "Texture", "ImageQuality", "Count", "Threshold"]
 
@@ -124,6 +124,7 @@ task profiling {
     start = time.time()
     sc = SingleCells(
         'sqlite:///~{plate_id}.sqlite',
+        strata=['Metadata_Plate', 'Metadata_Well', 'ImageNumber],
         aggregation_operation='~{aggregation_operation}',
         add_image_features=~{if add_image_features then "True" else "False"},
         image_feature_categories=IMAGE_FEATURE_CATEGORIES)
