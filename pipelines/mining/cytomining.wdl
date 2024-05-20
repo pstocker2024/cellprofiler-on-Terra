@@ -1,4 +1,4 @@
-version 1.0.0.1
+version 1.0
 
 import "../../utils/cellprofiler_distributed_utils.wdl" as util
 
