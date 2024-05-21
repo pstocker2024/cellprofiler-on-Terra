@@ -124,7 +124,7 @@ task profiling {
     start = time.time()
     sc = SingleCells(
         'sqlite:///~{plate_id}.sqlite',
-        strata=['Metadata_Plate', 'Metadata_Well', 'ImageNumber'],
+        strata=['Metadata_Plate', 'Metadata_Well', 'Metadata_Site'],
         aggregation_operation='~{aggregation_operation}',
         add_image_features=~{if add_image_features then "True" else "False"},
         image_feature_categories=IMAGE_FEATURE_CATEGORIES)
