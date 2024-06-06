@@ -14,6 +14,8 @@ import tempfile
 import csv
 import shutil
 
+import xml.etree.ElementTree as ET
+
 _logger = logging.getLogger(__name__)
 
 
@@ -290,6 +292,7 @@ def cli(*args, **kwargs):
     type=str,
     default="load_data.csv",
     help="Output file location.")
+
 def pe2_load_data(
     index_directory: str,
     index_file: str,
@@ -298,6 +301,36 @@ def pe2_load_data(
     output_file: str,
 ) -> None:
     index_file_path = os.path.join(index_directory, index_file)
+    doc = DocContentHandler()
+    xml.sax.parse(index_file_path, doc)
+
+    images = doc.root.images.images
+    plates = doc.root.plates.plates
+    wells = doc.root.wells.wells
+
+    paths = {}
+    with open(image_file_path_collection_file) as f:
+        for line in f.readlines():
+            filename = [s.rstrip("\n")for s in os.path.split(line)][-1]
+            paths[filename] = "/cromwell_root/data"
+
+    channels, metadata = load_config(config_yaml)
+    channels = dict([(str(k).replace(" ", ""), v) for (k, v) in channels.items()])
+
+    df = convert_to_dataframe(images, plates, wells, channels, metadata, paths, config_yaml)
+    df.to_csv(output_file, index=False)
+    
+def pe2_load_data(
+    index_directory: str,
+    index_file: str,
+    image_file_path_collection_file: str,
+    config_yaml: str,
+    output_file: str,
+) -> None:
+    index_file_path = os.path.join(index_directory, index_file)
+
+    rewrite_harmonyV6_index_file(index_file_path)
+    
     doc = DocContentHandler()
     xml.sax.parse(index_file_path, doc)
 
